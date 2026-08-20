@@ -1,6 +1,9 @@
+# Local secrets and machine-only configuration — never include in a release snapshot.
 .env
 .env.*
 !.env.example
+
+# Local dependencies, build output, and test artifacts.
 node_modules/
 .next/
 coverage/
@@ -8,6 +11,8 @@ dist/
 build/
 test-results/
 playwright-report/
+
+# Local data and generated media.
 database/local/
 .agents/
 output/
