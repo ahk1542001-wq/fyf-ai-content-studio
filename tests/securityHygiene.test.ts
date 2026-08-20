@@ -99,16 +99,17 @@ describe("repository security hygiene", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("keeps product source free of legacy client-specific identifiers", () => {
+  it("keeps product source free of private-only markers", () => {
     const productPaths = ["app", "backend", "config", "database", "docs", "frontend", "integrations", "src", ".env.example"];
     const productFiles = productPaths.flatMap((entry) => {
       const path = join(appRoot, entry);
       return statSync(path).isDirectory() ? walkFiles(path) : [path];
-    });
+    }).filter((path) => path !== join(appRoot, "docs/public-release-audit.md"));
+    const privateOnlyMarkers = ["ORIGINAL_REQUEST.md", "Second Brain Test", "FYF-AI-Content-Agent-Service"];
     const offenders = productFiles
       .filter((path) => /\.(md|ts|tsx|sql|css|example)$/.test(path))
       .map((path) => ({ path: relative(appRoot, path), content: readText(path) }))
-      .filter(({ content }) => /yeman/i.test(content))
+      .filter(({ content }) => privateOnlyMarkers.some((marker) => content.includes(marker)))
       .map(({ path }) => path);
 
     expect(offenders).toEqual([]);

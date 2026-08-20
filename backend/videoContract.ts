@@ -1,11 +1,11 @@
 import type { BrandProfile, Draft, Workspace } from "@/backend/types";
 
-export type VideoVoiceMode = "victor" | "ai" | "dual";
+export type VideoVoiceMode = "configured" | "ai" | "dual";
 
 export type ApprovedVideoContentContract = {
   contractVersion: "fyf.video-content.v1";
   source: {
-    product: "fyf-ai-content-agent-service";
+    product: "fyf-ai-content-studio";
     handoff: "approved-content-only";
   };
   workspace: {
@@ -71,7 +71,7 @@ export function buildApprovedVideoContentContract(
   return {
     contractVersion: "fyf.video-content.v1",
     source: {
-      product: "fyf-ai-content-agent-service",
+      product: "fyf-ai-content-studio",
       handoff: "approved-content-only"
     },
     workspace: {

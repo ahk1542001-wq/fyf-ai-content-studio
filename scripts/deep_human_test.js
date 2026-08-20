@@ -4,11 +4,11 @@ const fs = require("fs");
 async function deepHumanTest() {
   console.log("🧪 Starting Deep Human-Like UI Interactive Test & Verification...");
 
-  const chromeExecutable = "/Users/mac/Library/Caches/ms-playwright/chromium-1234/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing";
+  const chromeExecutable = process.env.CHROME_EXECUTABLE_PATH;
 
   const browser = await chromium.launch({
     headless: true,
-    executablePath: fs.existsSync(chromeExecutable) ? chromeExecutable : undefined,
+    executablePath: chromeExecutable && fs.existsSync(chromeExecutable) ? chromeExecutable : undefined,
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--window-size=1920,1080"],
   });
 

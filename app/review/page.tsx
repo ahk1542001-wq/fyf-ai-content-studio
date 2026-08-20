@@ -26,11 +26,12 @@ function ReviewContent() {
   const draftIdParam = searchParams.get("draftId") || searchParams.get("id");
   const workspaceIdParam = searchParams.get("workspaceId");
 
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace();
   const activeWorkspaceId = workspaceIdParam || currentWorkspace?.id || "ws-fyf";
 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -40,35 +41,57 @@ function ReviewContent() {
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadDraft() {
+      if (isWorkspaceLoading) return;
       setIsLoading(true);
+      setLoadError("");
+      setDraft(null);
       try {
         if (draftIdParam) {
           const res = await fetch(`/api/workspaces/${activeWorkspaceId}/drafts/${draftIdParam}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.draft) {
-              setDraft(data.draft);
-              return;
-            }
+          const data = await res.json().catch(() => ({}));
+          if (res.status === 404) {
+            if (!cancelled) setLoadError("No Draft Found");
+            return;
           }
+          if (!res.ok || !data.draft) {
+            throw new Error(typeof data.error === "string" ? data.error : "Could not load draft");
+          }
+          if (!cancelled) setDraft(data.draft);
+          return;
         }
-        // Fallback: load latest draft from workspace
+
         const resAll = await fetch(`/api/workspaces/${activeWorkspaceId}/drafts`);
-        if (resAll.ok) {
-          const data = await resAll.json();
-          if (data.drafts && data.drafts.length > 0) {
-            setDraft(data.drafts[0]);
-          }
+        const data = await resAll.json().catch(() => ({}));
+        if (!resAll.ok) {
+          throw new Error(typeof data.error === "string" ? data.error : "Could not load drafts");
         }
+        if (!Array.isArray(data.drafts) || data.drafts.length === 0) {
+          if (!cancelled) setLoadError("No Draft Found");
+          return;
+        }
+        if (!cancelled) setDraft(data.drafts[0]);
       } catch (err) {
-        console.error("Failed to load draft for review:", err);
+        if (!cancelled) {
+          setLoadError(err instanceof Error ? `Could not load draft: ${err.message}` : "Could not load draft");
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
+
     loadDraft();
-  }, [activeWorkspaceId, draftIdParam]);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeWorkspaceId, draftIdParam, isWorkspaceLoading]);
+
+  function errorMessageFrom(payload: { error?: string | { message?: string } }, fallback: string) {
+    if (typeof payload.error === "string") return payload.error;
+    return payload.error?.message || fallback;
+  }
 
   const handleApprove = async () => {
     if (!draft) return;
@@ -77,13 +100,22 @@ function ReviewContent() {
       const res = await fetch(`/api/workspaces/${activeWorkspaceId}/drafts/${draft.id}/approve`, {
         method: "POST"
       });
-      if (res.ok) {
-        const data = await res.json();
-        setDraft(data.draft || { ...draft, status: "approved" });
-        setStatusMessage({ type: "success", text: "🎉 စာမူနှင့် ပုံများကို အတည်ပြုပြီးပါပြီ! (Approved for Publishing)" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(errorMessageFrom(data, "Could not approve this draft."));
       }
-    } catch {
-      setStatusMessage({ type: "error", text: "အတည်ပြုရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်။" });
+      if (!data.draft) {
+        throw new Error("Approval completed without a saved draft response.");
+      }
+      setDraft(data.draft);
+      setStatusMessage({ type: "success", text: "🎉 စာမူနှင့် ပုံများကို အတည်ပြုပြီးပါပြီ! (Approved for Publishing)" });
+    } catch (error) {
+      setStatusMessage({
+        type: "error",
+        text: error instanceof Error
+          ? `အတည်ပြုရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်။ ${error.message}`
+          : "အတည်ပြုရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်။"
+      });
     } finally {
       setIsActionLoading(false);
     }
@@ -104,14 +136,23 @@ function ReviewContent() {
           instruction: feedbackText.trim()
         })
       });
-      if (res.ok) {
-        const data = await res.json();
-        setDraft(data.draft || { ...draft, status: "needs_review", version: draft.version + 1 });
-        setStatusMessage({ type: "success", text: `✨ AI Auto-Fix ဖြင့် Version ${data.draft?.version || draft.version + 1} အဖြစ် ပြင်ဆင်ပြီးပါပြီ!` });
-        setFeedbackText("");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(errorMessageFrom(data, "Could not apply the requested changes."));
       }
-    } catch {
-      setStatusMessage({ type: "error", text: "ပြင်ဆင်ရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်။" });
+      if (!data.draft) {
+        throw new Error("Revision completed without a saved draft response.");
+      }
+      setDraft(data.draft);
+      setStatusMessage({ type: "success", text: `✨ AI Auto-Fix ဖြင့် Version ${data.draft.version || draft.version + 1} အဖြစ် ပြင်ဆင်ပြီးပါပြီ!` });
+      setFeedbackText("");
+    } catch (error) {
+      setStatusMessage({
+        type: "error",
+        text: error instanceof Error
+          ? `ပြင်ဆင်ရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်။ ${error.message}`
+          : "ပြင်ဆင်ရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်။"
+      });
     } finally {
       setIsActionLoading(false);
       setIsAutoFixing(false);
@@ -170,6 +211,25 @@ function ReviewContent() {
     return (
       <div style={{ maxWidth: "1000px", margin: "80px auto", textAlign: "center", color: BRAND_COLORS.SOFT_SAGE }}>
         <p className="animate-pulse">Loading draft for client review...</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    const isEmpty = loadError === "No Draft Found";
+    return (
+      <div
+        role="alert"
+        style={{ maxWidth: "800px", margin: "60px auto", padding: "32px", backgroundColor: BRAND_COLORS.SURFACE_WHITE, borderRadius: "12px", textAlign: "center" }}
+      >
+        <h3 style={{ color: BRAND_COLORS.OLIVE_INK }}>{isEmpty ? "No Draft Found" : "Could not load draft"}</h3>
+        <p style={{ color: BRAND_COLORS.SOFT_SAGE, marginBottom: "20px" }}>
+          {isEmpty ? "There is no active draft to review in this workspace." : `${loadError}. Check the local service and try again.`}
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+          <button onClick={() => window.location.reload()} className="primary-button">Try again</button>
+          <button onClick={() => router.push("/create")} className="ghost-button">Go to Studio</button>
+        </div>
       </div>
     );
   }

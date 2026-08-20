@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FYF AI Content Studio",
-  description: "Personal FYF content studio with brand guidance, approval boundaries, and video handoff."
+  description: "FYF content studio with brand guidance, approval boundaries, and video handoff."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

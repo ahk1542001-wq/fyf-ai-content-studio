@@ -32,12 +32,12 @@ describe('LLMGateway Gemini 3 migration and Maker/Checker alignment', () => {
     });
   });
 
-  it('uses the GA Gemini 3 models through the US multi-region endpoint', async () => {
+  it('uses Gemini 3.7 Flash for both Creator and Editor through the US multi-region endpoint', async () => {
     const { FYF_VERTEX_MODELS, LLMGateway } = await import('@/src/infrastructure/llm/gateway');
 
     expect(FYF_VERTEX_MODELS).toEqual({
-      creator: 'gemini-3.5-flash',
-      editor: 'gemini-3.5-flash-lite',
+      creator: 'gemini-3.7-flash',
+      editor: 'gemini-3.7-flash',
       location: 'us',
     });
     expect(createVertex).toHaveBeenCalledWith({
@@ -48,11 +48,11 @@ describe('LLMGateway Gemini 3 migration and Maker/Checker alignment', () => {
     await LLMGateway.createDraft('topic', 'goal', []);
     await LLMGateway.reviewDraft('draft');
 
-    expect(vertexModel).toHaveBeenNthCalledWith(1, 'gemini-3.5-flash');
-    expect(vertexModel).toHaveBeenNthCalledWith(2, 'gemini-3.5-flash-lite');
+    expect(vertexModel).toHaveBeenNthCalledWith(1, 'gemini-3.7-flash');
+    expect(vertexModel).toHaveBeenNthCalledWith(2, 'gemini-3.7-flash');
   });
 
-  it('does not send unsupported custom sampling parameters to Flash-Lite', async () => {
+  it('does not send unsupported custom sampling parameters to Gemini 3.7 Flash', async () => {
     const { LLMGateway } = await import('@/src/infrastructure/llm/gateway');
 
     await LLMGateway.reviewDraft('draft');
@@ -61,6 +61,17 @@ describe('LLMGateway Gemini 3 migration and Maker/Checker alignment', () => {
     expect(generateObject.mock.calls[0][0]).not.toHaveProperty('temperature');
     expect(generateObject.mock.calls[0][0]).not.toHaveProperty('topK');
     expect(generateObject.mock.calls[0][0]).not.toHaveProperty('topP');
+  });
+
+  it('does not send a legacy temperature parameter to Gemini 3.7 Flash Creator', async () => {
+    const { LLMGateway } = await import('@/src/infrastructure/llm/gateway');
+
+    await LLMGateway.createDraft('topic', 'goal', []);
+
+    expect(generateText).toHaveBeenCalledOnce();
+    expect(generateText.mock.calls[0][0]).not.toHaveProperty('temperature');
+    expect(generateText.mock.calls[0][0]).not.toHaveProperty('topK');
+    expect(generateText.mock.calls[0][0]).not.toHaveProperty('topP');
   });
 
   it('formats few-shot style examples and Burmese brand instructions into the Creator prompt', async () => {

@@ -38,9 +38,9 @@ Phase 0A ("Existing-System Audit and Implementation Specification") has been upd
 
 ## 3. Key Audit Findings & Discoveries
 
-1. **Test Path Correction:** `tests/securityHygiene.test.ts` path resolution was updated to correctly locate `.gitignore` in `appRoot` (`/Users/mac/Projects/code/FYF-AI-Content-Agent-Service`).
+1. **Test Path Correction:** `tests/securityHygiene.test.ts` resolves `.gitignore` from the repository root rather than relying on a machine-specific path.
 2. **Deterministic Risk Guard Utility:** `integrations/riskGuard.ts` contains a high-value regex matching and safer rewrite engine.
-3. **UI Preservation:** The existing Next.js frontend in `frontend/screens/` implements the exact 5-screen IA (**Today**, **Create**, **Review**, **Export**, **Settings**) required for Victor to operate the FYF AI pilot.
+3. **UI Preservation:** The existing Next.js frontend preserves the verified FYF operator flow across **Create**, **Content Planner**, **Review**, **Analytics**, and **Brand/References** surfaces.
 
 ---
 
@@ -54,7 +54,7 @@ Phase 0A ("Existing-System Audit and Implementation Specification") has been upd
 ## 5. Blockers
 
 - Database, authentication provider, and application ORM are still owner decisions.
-- Phase 0B remains blocked until Victor approves one narrowly defined connection-spike stack and spend boundary.
+- Phase 0B remains blocked until a human owner approves one narrowly defined connection-spike stack and spend boundary.
 
 ---
 
@@ -62,7 +62,7 @@ Phase 0A ("Existing-System Audit and Implementation Specification") has been upd
 
 No DB/Auth/ORM stack is approved yet. Supabase + Supabase Auth + Drizzle, Neon + external Auth + Drizzle, and Cloud SQL + Auth.js + an owner-approved ORM remain candidates only.
 
-After Victor selects a stack, the narrow Phase 0B spike must verify:
+After the owner selects a stack, the narrow Phase 0B spike must verify:
 - actual connection and pooling behavior for the pinned LangGraph.js checkpointer package;
 - schema ownership separation among application migrations, authentication, LiteLLM, and LangGraph checkpoints;
 - ORM connection behavior and migration isolation;
@@ -75,4 +75,4 @@ After Victor selects a stack, the narrow Phase 0B spike must verify:
 
 **Phase 0A is complete. Stop Gate remains active.**
 
-**Next Action:** Victor selects the DB/Auth/ORM candidate and explicitly authorizes the exact Phase 0B connection spike. Selection is approval to plan that spike, not blanket approval to provision production resources.
+**Next Action:** The owner selects the DB/Auth/ORM candidate and explicitly authorizes the exact Phase 0B connection spike. Selection is approval to plan that spike, not blanket approval to provision production resources.

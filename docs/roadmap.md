@@ -1,7 +1,7 @@
 # FYF AI Content Studio Roadmap
 
 **Status:** Local-first Studio execution
-**Last updated:** August 20, 2026
+**Last updated:** August 21, 2026
 
 ## Current baseline
 
@@ -22,14 +22,14 @@
 3. **Local reliability**
    - Continue cache, reset, collision, analytics, brand-profile, and full-decode tests.
    - Add resumable export checkpoints without copying local data between repositories.
-4. **Public release gate**
-   - Review committed history for local databases and FYF-owned content.
-   - Sanitize or create an approved public mirror only after explicit maintainer approval.
-   - Keep this working repository private until that gate passes.
+4. **Public release maintenance**
+   - Keep the public snapshot allowlisted and free of local data, credentials, generated output, and personal history.
+   - Run the checked-in CI workflow on every pull request and push.
+   - Export future updates through the same reviewed snapshot process rather than merging private history.
 
 ## Explicitly deferred
 
 - Hosted authentication, durable cloud storage, billing, subscriptions, and multi-tenant SaaS.
 - Automated Facebook publishing or external workflow execution.
 - External client workflows and automation adapters in the FYF runtime.
-- Any major dependency upgrade (including a Next major) without a separate test and approval task.
+- Any major dependency upgrade without a separate test and approval task.

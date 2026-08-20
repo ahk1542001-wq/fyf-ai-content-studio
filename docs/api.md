@@ -1,6 +1,6 @@
 > [!WARNING]
-> **CURRENT LOCAL API WITH LEGACY COMPATIBILITY NAMES**
-> These route contracts describe the private local FYF Studio. Some environment variables, adapter names, and historical examples retain legacy identifiers for state compatibility; they are not the product name or a current Studio runtime dependency.
+> **CURRENT LOCAL API WITH COMPATIBILITY NAMES**
+> These route contracts describe the local FYF Studio. Some environment variables, adapter names, and historical examples retain compatibility identifiers; they are not external services or public network guarantees.
 
 This document captures the current local API boundary for FYF AI Content Studio. The Studio owns brand context, writing, review, and approval; the separate FYF Video Pipeline owns voice, visuals, motion, and final rendering. External client workflow files are reference residue only and are not called by this runtime.
 

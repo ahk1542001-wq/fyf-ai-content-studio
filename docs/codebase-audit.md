@@ -1,6 +1,6 @@
 # Codebase Audit & Migration Inventory
 
-**Project:** FYF AI Content Agent Service (`FYF-AI-Content-Agent-Service`)
+**Project:** FYF AI Content Studio (`fyf-ai-content-studio`)
 **Phase:** Phase 0A (Existing-System Audit and Implementation Specification)
 **Date:** July 23, 2026
 
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-This document performs an empirical audit of the earlier prototype codebase (now migrated to `FYF-AI-Content-Agent-Service`). The repository currently functions as a Phase 0.5 prototype ("Private Operator App" for Facebook content creation using SQLite demo snapshots, mock Gemini/Facebook/Sheets adapters, and synchronous draft lifecycle logic).
+This document performs an empirical audit of the earlier prototype codebase (now migrated to `fyf-ai-content-studio`). The repository currently functions as a Phase 0.5 prototype ("Local Operator App" for Facebook content creation using SQLite demo snapshots, mock Gemini/Facebook/Sheets adapters, and synchronous draft lifecycle logic).
 
 To transition into the confirmed **Agent-as-a-Service** architecture for FYF AI (LangGraph.js orchestration, private Cloud Run worker, Cloud Tasks dispatch, PostgreSQL state, and LiteLLM Proxy gateway targeting Vertex AI/Gemini), every subsystem in the existing codebase is audited and classified below into one of five categories:
 - **PRESERVE:** Retain as-is or use directly in Phase 1+.
@@ -22,7 +22,7 @@ To transition into the confirmed **Agent-as-a-Service** architecture for FYF AI 
 ## 2. Repository Structure & Runtime Inventory
 
 ```
-FYF-AI-Content-Agent-Service/ (former fyf_web_app_test prototype)
+fyf-ai-content-studio/ (former fyf_web_app_test prototype)
 ├── package.json               [PRESERVE] - Next.js 15, React 19, Vitest, Playwright, Tailwind CSS setup
 ├── app/                       [ADAPT]    - Next.js App Router (UI screens and API routes)
 │   ├── page.tsx               [ADAPT]    - Root dashboard entry point

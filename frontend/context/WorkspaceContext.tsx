@@ -46,6 +46,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data.workspaces && Array.isArray(data.workspaces)) {
           setWorkspaces(data.workspaces);
+          setActiveId((currentId) => {
+            if (data.workspaces.some((workspace: Workspace) => workspace.id === currentId)) {
+              return currentId;
+            }
+            return data.workspaces[0]?.id || DEFAULT_WORKSPACE.id;
+          });
         }
       }
     } catch (err) {

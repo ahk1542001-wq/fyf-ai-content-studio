@@ -3,7 +3,7 @@
 Local-first workspace for turning FYF brand ideas into reviewed Burmese content and approved video handoffs.
 
 > [!NOTE]
-> **Current Status:** Public FYF Studio snapshot — local-first runtime, brand context, human review gates, and manual export only. Hosted deployment is a separate pending step.
+> **Current Status:** Public FYF Studio snapshot — local-first runtime, brand context, human review gates, and manual export only. Hosted deployment is intentionally out of scope.
 > Phase 0B (DB/Auth Connection Spike) is **not authorized** and has not been started.
 
 > [!WARNING]
@@ -42,7 +42,7 @@ The current real-use-case build is intentionally local-first while the productio
 | Area | Current FYF build | Future reviewed path |
 | --- | --- | --- |
 | Storage | Local SQLite with workspace-scoped state | Durable production store after a separate approval |
-| AI | Vertex boundary with a safe local route | Vertex/Gemini runtime with measured credentials and quotas |
+| AI | Vertex boundary with a safe local route | Vertex/Gemini runtime (`gemini-3.7-flash`) with measured credentials and quotas |
 | Publishing | Manual export and operator tracking | Explicitly reviewed publishing integration |
 | Video | Separate `fyf-video-pipeline` repository | Versioned content/video contract; no code or data copying |
 
@@ -51,10 +51,10 @@ The current real-use-case build is intentionally local-first while the productio
 The FYF Studio owns brand context, writing, review, and approval. The separate FYF Video Pipeline owns voice, visuals, motion, and final video rendering. After a human reviewer approves a draft, the local API exposes a minimal, typed handoff:
 
 ```text
-GET /api/workspaces/{workspaceId}/drafts/{draftId}/video-contract?voice=ai|victor|dual
+GET /api/workspaces/{workspaceId}/drafts/{draftId}/video-contract?voice=ai|configured|dual
 ```
 
-The endpoint is implemented locally and returns only approved script text, FYF brand rules, selected voice mode, and approval metadata. It refuses drafts that are not approved and never includes credentials, local file paths, SQLite payloads, or provider tokens. Automated cross-repository execution remains deferred; the separate renderer consumes this contract when that integration is explicitly approved.
+The endpoint is implemented locally and returns only approved script text, FYF brand rules, selected voice mode, and approval metadata. It refuses drafts that are not approved and never includes credentials, local file paths, SQLite payloads, or provider tokens. The `configured` voice is an adapter placeholder; deployments can bind it to their own approved voice implementation. Automated cross-repository execution remains deferred; the separate renderer consumes this contract when that integration is explicitly approved.
 
 ---
 

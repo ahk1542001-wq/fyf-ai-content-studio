@@ -1,12 +1,11 @@
 # FYF AI Content Studio
 
-**Up:** [[system/PROJECT_INDEX|Project Index]] | **Agents:** [[projects/FYF-AI-Content-Agent-Service/AGENTS|AGENTS]]
+Local-first workspace for turning FYF brand guidance into reviewed Burmese content,
+manual exports, and an explicit handoff to a separate video renderer.
 
-**Type**: Personal / Private local pilot
-**Current status**: Local-first Studio; Phase 2 Agency Mode features verified
-**Short purpose**: FYF brand-guided content creation, human review, approval, analytics, and a typed handoff to the separate video pipeline.
-**Canonical Code Repository**: `/Users/mac/Projects/code/FYF-AI-Content-Agent-Service`
-**GitHub Repository**: `ahk1542001-wq/FYF-AI-Content-Agent-Service` (PRIVATE)
+- **Runtime:** Next.js, React, TypeScript, LangGraph.js, Vertex AI / Gemini 3.7 Flash
+- **Storage:** Local SQLite for operator-controlled state
+- **Quality boundary:** Deterministic checks plus human approval before export
+- **Distribution:** Public reference snapshot; hosted auth, cloud storage, and automatic publishing are out of scope
 
-## Context
-The canonical code repository is private and local-first. This vault location holds project context, handoffs, and specifications. The older Phase 0A hosted Agent-as-a-Service documents remain preserved as historical/deferred design evidence; they are not the current runtime architecture.
+See [README.md](README.md) for setup, architecture, verification, and release boundaries.

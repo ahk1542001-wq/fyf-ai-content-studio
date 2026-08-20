@@ -64,29 +64,6 @@ type ChatMessage = {
 const defaultAudience =
   "Myanmar SME owners, founders, business operators, creators, and developers learning practical AI automation.";
 
-function buildDraft(topic: string, details: string, _postType: PostType) {
-  const cleanTopic = topic.trim() || "AI Systems Workflow";
-  const cleanDetails = details.trim();
-
-  return [
-    `${cleanTopic} နှင့် ပတ်သက်ပြီး လုပ်ငန်းခွင်မှာ AI အသုံးပြုရာတွင် မဖြစ်မနေ သတိပြုရမည့် အချက်တစ်ခု ရှိပါတယ်။`,
-    "",
-    "လုပ်ငန်းတော်တော်များများက AI Tool တွေကို အသုံးပြုပြီး အလုပ်တွေ အမြန်ပြီးဖို့ ကြိုးစားကြပါတယ်။ ဒါပေမဲ့ အချက်အလက်ဖတ်တာ မြန်တိုင်း၊ စာရင်းထွက်လာတိုင်း အဲ့ဒါကို တိုက်ရိုက် အတည်ပြုလိုက်မယ်ဆိုရင် မလိုအပ်တဲ့ အမှားတွေ ဖြစ်လာနိုင်ပါတယ်။",
-    cleanDetails ? `\nအဓိက အာရုံစိုက်ရန် အချက်:\n${cleanDetails}\n` : "",
-    "FYF AI ၏ အဓိက စနစ်စည်းမျဉ်း (၃) ရပ်:",
-    "၁။ အချက်အလက် ကူညီမှတ်သားခြင်း - AI က Chat နှင့် ဖောင်များမှ အချက်အလက်များကို စနစ်တကျ ကူညီမှတ်ပေးမည်။",
-    "၂။ မန်နေဂျာ ကိုယ်တိုင် စစ်ဆေးခြင်း (Human Gate) - ဘဏ်ငွေဝင်ရောက်မှုနှင့် စည်းမျဉ်းများကို လူက စစ်ဆေးပြီးမှသာ အတည်ပြုမည်။",
-    "၃။ အတည်ပြုပြီးမှ ဆောင်ရွက်ခြင်း - စစ်ဆေးပြီးမှသာ ပစ္စည်းထုတ်ပေးခြင်း သို့မဟုတ် ငွေလွှဲခြင်းကို ဆောင်ရွက်မည်။",
-    "",
-    "💡 အဓိက သတိပြုရန် စည်းမျဉ်း:",
-    "\"AI ကို အချက်အလက် စုစည်းခိုင်းပါ။ ငွေကြေးနှင့် စီးပွားရေး ဆုံးဖြတ်ချက်ကိုတော့ လူကပဲ အတည်ပြုပါ။\"",
-    "",
-    "သင့်လုပ်ငန်းအတွက် စိတ်ကြိုက် AI Workflow စနစ် တည်ဆောက်လိုပါက Page Messenger သို့ \x27WORKFLOW\x27 ဟု ပို့ပြီး တိုင်ပင်ဆွေးနွေးနိုင်ပါသည်",
-    "",
-    "#FYFAI #AIAgents #BusinessAutomation #HumanInTheLoop",
-  ].filter(Boolean).join("\n");
-}
-
 const CONTENT_PILLARS: Array<{
   id: ContentPillarKey;
   title: string;
@@ -135,7 +112,7 @@ const CONTENT_PILLARS: Array<{
 ];
 
 export default function CreatePage() {
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace();
   const activeWorkspaceId = currentWorkspace?.id || "ws-fyf";
 
   const [step, setStep] = useState<Step>("write");
@@ -164,6 +141,7 @@ export default function CreatePage() {
 
   const [bannerResult, setBannerResult] = useState<BannerGenerationResult | null>(null);
   const [recommendations, setRecommendations] = useState<TopicRecommendation[]>([]);
+  const [recommendationError, setRecommendationError] = useState("");
 
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [copilotInput, setCopilotInput] = useState("");
@@ -172,7 +150,7 @@ export default function CreatePage() {
     {
       id: "msg-1",
       sender: "copilot",
-      text: "မင်္ဂလာပါ Victor! ကျွန်တော်က FYF Content Co-pilot ဖြစ်ပါတယ်။ သင့်မှာ အိုင်ဒီယာ အကြမ်းပဲရှိတာဖြစ်ဖြစ်၊ သတင်းအသစ် (ဥပမာ Grok Bot, Claude) အကြောင်း ရေးချင်တာဖြစ်ဖြစ် မေးနိုင်ပါတယ်။ အောက်ပါ prompt တွေကိုလည်း နှိပ်ပြီး စတင်နိုင်ပါတယ် -",
+      text: "မင်္ဂလာပါ! ကျွန်တော်က FYF Content Co-pilot ဖြစ်ပါတယ်။ အိုင်ဒီယာအကြမ်းပဲရှိတာဖြစ်ဖြစ်၊ AI အလုပ်အသုံးချမှုအကြောင်း ရေးချင်တာဖြစ်ဖြစ် မေးနိုင်ပါတယ်။ အောက်ပါ prompt တွေကိုလည်း နှိပ်ပြီး စတင်နိုင်ပါတယ် -",
       suggestions: [
         {
           title: "AI News Reality Check: Grok Bot & Multi-Agent Teams",
@@ -204,18 +182,25 @@ export default function CreatePage() {
 
   useEffect(() => {
     async function loadRecommendations() {
+      if (isWorkspaceLoading) return;
+      setRecommendationError("");
       try {
         const res = await fetch(`/api/workspaces/${activeWorkspaceId}/analytics/recommendations`);
-        const data = await res.json();
-        if (data.ok && Array.isArray(data.recommendations)) {
-          setRecommendations(data.recommendations);
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; recommendations?: TopicRecommendation[]; error?: string };
+        if (!res.ok || !data.ok || !Array.isArray(data.recommendations)) {
+          throw new Error(data.error || "Topic recommendations are unavailable");
         }
-      } catch {
-        // Silently fallback if needed
+        setRecommendations(data.recommendations);
+      } catch (error) {
+        setRecommendationError(
+          error instanceof Error
+            ? `${error.message}. You can still enter a topic manually.`
+            : "Topic recommendations are unavailable. You can still enter a topic manually."
+        );
       }
     }
     loadRecommendations();
-  }, [activeWorkspaceId]);
+  }, [activeWorkspaceId, isWorkspaceLoading]);
 
   const detectedPillar = useMemo<ContentPillarKey>(() => {
     const text = `${topic} ${details} ${draft}`.toLowerCase();
@@ -279,7 +264,7 @@ export default function CreatePage() {
   const processHeadline = isGenerating
     ? "AI is working"
     : generateError
-      ? "AI fallback used"
+      ? "Generation blocked"
       : photoConfirmed
         ? "Ready to export"
         : confirmedContent
@@ -290,7 +275,7 @@ export default function CreatePage() {
   const processSubtext = isGenerating
     ? "Reading context and generating calibrated Burmese draft..."
     : generateError
-      ? "Real AI failed. A local fallback draft is shown — edit it before confirming."
+      ? "No draft was created or approved. Fix the connection and try again."
       : photoConfirmed
         ? "Caption and vector graphic are ready for manual export."
         : confirmedContent
@@ -340,6 +325,14 @@ export default function CreatePage() {
       if (parsed.preferredFamily) setPreferredFamily(parsed.preferredFamily);
       if (parsed.bannerResult) setBannerResult(parsed.bannerResult);
       if (parsed.details) setShowDetails(true);
+      if (parsed.draft && !parsed.draftId) {
+        window.localStorage.removeItem("fyf-create-draft");
+        setDraft("");
+        setDraftId("");
+        setConfirmedContent(false);
+        setPhotoConfirmed(false);
+        return;
+      }
       if (parsed.draft) setSaveStatus("saved");
       if (parsed.photoConfirmed) setStep("export");
       else if (parsed.confirmedContent) setStep("photo");
@@ -391,6 +384,10 @@ export default function CreatePage() {
     const formatToUse = targetFormat || visualFormat;
 
     if (!topicToUse.trim()) return;
+    if (isWorkspaceLoading) {
+      setGenerateError("Workspace is still loading. Try again in a moment.");
+      return;
+    }
 
     if (targetTopic) setTopic(targetTopic);
     if (targetDetails !== undefined) setDetails(targetDetails);
@@ -402,6 +399,7 @@ export default function CreatePage() {
     setApprovalMessage("");
     setApprovalStatus("idle");
     setPublishStatus("idle");
+    setDraft("");
     setConfirmedContent(false);
     setPhotoConfirmed(false);
     setDraftId("");
@@ -424,20 +422,25 @@ export default function CreatePage() {
         }),
       });
       const payload = (await response.json().catch(() => ({}))) as DraftApiResponse;
-      if (!response.ok || !payload.draft?.content) {
-        throw new Error(errorMessageFrom(payload, "Draft API did not return content"));
+      if (!response.ok || !payload.draft?.content || !payload.draft.id) {
+        throw new Error(errorMessageFrom(payload, "Draft API did not return a saved draft and id"));
       }
       const nextDraft = payload.draft.content;
       setDraft(nextDraft);
-      setDraftId(payload.draft.id || "");
+      setDraftId(payload.draft.id);
     } catch (error) {
-      const fallbackDraft = buildDraft(topicToUse, detailsToUse, postType);
-      setDraft(fallbackDraft);
-      setGenerateError(
+      setDraft("");
+      setDraftId("");
+      setConfirmedContent(false);
+      setPhotoConfirmed(false);
+      setStep("write");
+      const message =
         error instanceof Error
-          ? `Real AI failed, so a local fallback draft is shown for editing: ${error.message}`
-          : "Real AI failed, so a local fallback draft is shown for editing."
-      );
+          ? `Draft generation failed: ${error.message}. Nothing was created or approved. Fix the connection and try again.`
+          : "Draft generation failed. Nothing was created or approved. Fix the connection and try again.";
+      setGenerateError(message);
+      setApprovalStatus("error");
+      setApprovalMessage(message);
     } finally {
       setIsGenerating(false);
     }
@@ -458,21 +461,16 @@ export default function CreatePage() {
       setApprovalMessage("Wait until draft generation finishes before confirming content.");
       return;
     }
+    if (!draftId) {
+      setApprovalStatus("error");
+      setApprovalMessage("This draft was not saved. Generate it again before approval.");
+      return;
+    }
     setApprovalStatus("working");
-    setApprovalMessage(draftId ? "Saving edits and running Risk Guard before banner studio." : "Local fallback draft approved for banner studio.");
+    setApprovalMessage("Saving edits and running Risk Guard before banner studio.");
 
     const targetFamily: BannerTemplateFamily = visualFormat === "album" ? "album_carousel" : preferredFamily;
     setPreferredFamily(targetFamily);
-
-    if (!draftId) {
-      setConfirmedContent(true);
-      setApprovalStatus("saved");
-      setApprovalMessage("Approved locally. Proceeding to Visual Banner Studio.");
-      const initResult = generateBannerFromDraft(draftForBanner, targetFamily);
-      setBannerResult(initResult);
-      setStep("photo");
-      return;
-    }
 
     try {
       const editResponse = await fetch(`/api/workspaces/${activeWorkspaceId}/drafts/${encodeURIComponent(draftId)}`, {
@@ -715,7 +713,7 @@ export default function CreatePage() {
                   <strong>{stage.label}</strong>
                   <p>{stage.detail}</p>
                 </div>
-                <em>{stage.status === "blocked" ? "needs approval" : stage.status}</em>
+                <em>{stage.status === "blocked" ? "blocked" : stage.status}</em>
               </li>
             ))}
           </ol>
@@ -1481,30 +1479,31 @@ export default function CreatePage() {
               className="primary-button"
               type="button"
               onClick={generateDraft}
-              disabled={!topic.trim() || isGenerating}
+              disabled={!topic.trim() || isGenerating || isWorkspaceLoading}
             >
-              {isGenerating ? "Generating draft..." : "Generate draft"}
+              {isWorkspaceLoading ? "Loading workspace..." : isGenerating ? "Generating draft..." : "Generate draft"}
             </button>
             <span className="helper-text">
               Uses FYF brand context, zero-jargon standard, and Messenger CTA.
             </span>
           </div>
-          {generateError ? <p className="form-message error">{generateError}</p> : null}
+          {generateError ? <p className="form-message error" role="alert">{generateError}</p> : null}
+          {recommendationError ? <p className="form-message error" role="alert">{recommendationError}</p> : null}
 
           <article className={`draft-preview ${draft ? "" : "empty-draft"}`}>
             <div className="panel-header compact">
               <h3>Draft preview</h3>
               <span>
                 {generateError
-                  ? "Local fallback draft"
+                  ? "Generation blocked"
                   : draft
                     ? confirmedContent
                       ? "Content confirmed"
-                      : "Needs Victor approval"
+                      : "Needs human approval"
                     : "Waiting for topic"}
               </span>
             </div>
-            {draft ? (
+            {draft && draftId ? (
               <>
                 {/* Quick Hashtags Toolbar */}
                 <div
@@ -1613,9 +1612,11 @@ export default function CreatePage() {
               </>
             ) : (
               <div className="empty-state">
-                <strong>No draft yet</strong>
+                <strong>{generateError ? "No draft was created" : "No draft yet"}</strong>
                 <p>
-                  Click a topic recommendation above, ask the Co-pilot, or enter a topic to generate a calibrated draft.
+                  {generateError
+                    ? "Fix the connection and generate again. Approval and visual studio remain locked until a saved draft is returned."
+                    : "Click a topic recommendation above, ask the Co-pilot, or enter a topic to generate a calibrated draft."}
                 </p>
               </div>
             )}

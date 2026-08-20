@@ -115,8 +115,8 @@ function createSupabase(scenario: Scenario) {
 
 function createScenario(overrides: Partial<Scenario> = {}): Scenario {
   return {
-    user: { id: "auth-user-1", email: "victor@example.com" },
-    appUser: { id: "app-user-1", email: "victor@example.com", full_name: "Victor" },
+    user: { id: "auth-user-1", email: "operator@example.com" },
+    appUser: { id: "app-user-1", email: "operator@example.com", full_name: "Human Operator" },
     membership: { workspace_id: "ws-owner", role: "owner" },
     inserts: [],
     updates: [],

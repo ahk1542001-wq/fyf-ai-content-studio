@@ -1317,7 +1317,7 @@ h1 { margin: 0; font-size: 24px; line-height: 1.2; }
   .data-panel p, .log-list p { grid-template-columns: 1fr; gap: 3px; }
 }
 
-/* Private Operator App redesign */
+/* Local Operator App redesign */
 .operator-shell {
   min-height: 100vh;
   display: grid;

@@ -73,7 +73,7 @@ export function renderLiveArchitectureUiSvg(props: LiveArchitectureUiProps): str
         <rect width="420" height="74" rx="8" fill="#1F281E" stroke="#30382C" stroke-width="1"/>
         <circle cx="25" cy="37" r="5" fill="#22C55E"/>
         <text x="45" y="28" font-family="${BRAND_FONTS.ENGLISH_HEADING}" font-weight="700" font-size="14" fill="${BRAND_COLORS.WARM_IVORY}">2. Context &amp; Ledger Match</text>
-        <text x="45" y="52" font-family="${BRAND_FONTS.SVG_DEFAULT_STACK}" font-weight="500" font-size="12" fill="#A8B7A2">Customer: @victor • Order: #1048 ကိုက်ညီမှုစစ်</text>
+        <text x="45" y="52" font-family="${BRAND_FONTS.SVG_DEFAULT_STACK}" font-weight="500" font-size="12" fill="#A8B7A2">Customer: @operator • Order: #1048 ကိုက်ညီမှုစစ်</text>
         <text x="395" y="42" font-family="${BRAND_FONTS.ENGLISH_HEADING}" font-weight="700" font-size="11" fill="#22C55E" text-anchor="end">[PASS]</text>
       </g>
 
@@ -118,7 +118,7 @@ export function renderLiveArchitectureUiSvg(props: LiveArchitectureUiProps): str
         <text y="144" fill="#A8B7A2">  <tspan fill="#60A5FA">"human_gate"</tspan>: {</text>
         <text y="168" fill="#A8B7A2">    <tspan fill="#60A5FA">"gate_required"</tspan>: <tspan fill="#F87171">true</tspan>,</text>
         <text y="192" fill="#A8B7A2">    <tspan fill="#60A5FA">"gate_reason"</tspan>: <tspan fill="#FBBF24">"FINANCIAL_DISPATCH"</tspan>,</text>
-        <text y="216" fill="#A8B7A2">    <tspan fill="#60A5FA">"approver"</tspan>: <tspan fill="#FBBF24">"VICTOR"</tspan>,</text>
+        <text y="216" fill="#A8B7A2">    <tspan fill="#60A5FA">"approver"</tspan>: <tspan fill="#FBBF24">"HUMAN"</tspan>,</text>
         <text y="240" fill="#A8B7A2">    <tspan fill="#60A5FA">"status"</tspan>: <tspan fill="#FBBF24">"AWAITING_CONFIRMATION"</tspan></text>
         <text y="264" fill="#A8B7A2">  },</text>
         <text y="288" fill="#A8B7A2">  <tspan fill="#60A5FA">"irreversible_action"</tspan>: <tspan fill="#F87171">false</tspan></text>

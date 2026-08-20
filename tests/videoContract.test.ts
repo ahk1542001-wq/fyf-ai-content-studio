@@ -41,14 +41,14 @@ describe("FYF approved video content contract", () => {
       workspace,
       draft: approvedDraft,
       brandProfile,
-      approvedBy: "Victor",
+      approvedBy: "Human Operator",
       approvedAt: "2026-08-20T12:01:00.000Z",
       voiceMode: "dual"
     });
 
     expect(contract).toMatchObject({
       contractVersion: "fyf.video-content.v1",
-      source: { product: "fyf-ai-content-agent-service" },
+      source: { product: "fyf-ai-content-studio" },
       workspace: { id: "ws-fyf", name: "FYF AI", pageName: "FYF AI" },
       content: {
         draftId: "draft-test-4",
@@ -58,7 +58,7 @@ describe("FYF approved video content contract", () => {
         language: "my"
       },
       voice: { mode: "dual" },
-      approval: { status: "approved", approvedBy: "Victor", approvedAt: "2026-08-20T12:01:00.000Z" }
+      approval: { status: "approved", approvedBy: "Human Operator", approvedAt: "2026-08-20T12:01:00.000Z" }
     });
     expect(JSON.stringify(contract)).not.toMatch(/\.env|sqlite|token|secret|local\/|demo-state/i);
   });
@@ -69,7 +69,7 @@ describe("FYF approved video content contract", () => {
         workspace,
         draft: { ...approvedDraft, status: "needs_review" },
         brandProfile,
-        approvedBy: "Victor",
+        approvedBy: "Human Operator",
         approvedAt: "2026-08-20T12:01:00.000Z",
         voiceMode: "ai"
       })
@@ -82,9 +82,9 @@ describe("FYF approved video content contract", () => {
         workspace,
         draft: { ...approvedDraft, workspaceId: "ws-other" },
         brandProfile,
-        approvedBy: "Victor",
+        approvedBy: "Human Operator",
         approvedAt: "2026-08-20T12:01:00.000Z",
-        voiceMode: "victor"
+        voiceMode: "configured"
       })
     ).toThrow("Draft does not belong to workspace");
   });

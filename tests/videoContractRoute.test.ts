@@ -12,7 +12,7 @@ describe("approved video contract route", () => {
 
   it("returns only an approved FYF draft contract for the video pipeline", async () => {
     const repository = getDemoRepository();
-    const approval = approveDraft(repository, "ws-fyf", "draft-risk", { actor: "Victor" });
+    const approval = approveDraft(repository, "ws-fyf", "draft-risk", { actor: "Human Operator" });
     expect(approval.ok).toBe(true);
 
     const response = await getVideoContract(
@@ -42,7 +42,7 @@ describe("approved video contract route", () => {
 
   it("rejects an unsupported voice mode as a client error", async () => {
     const repository = getDemoRepository();
-    const approval = approveDraft(repository, "ws-fyf", "draft-risk", { actor: "Victor" });
+    const approval = approveDraft(repository, "ws-fyf", "draft-risk", { actor: "Human Operator" });
     expect(approval.ok).toBe(true);
 
     const response = await getVideoContract(

@@ -188,7 +188,7 @@ function hasBurmese(text: string) {
 function isLegacyCustomizationDraft(draft: Draft) {
   return (
     /Audience:\s*Busy traders/i.test(draft.content) ||
-    /Ye Man style/i.test(draft.content)
+    /external workflow style/i.test(draft.content)
   );
 }
 
@@ -214,7 +214,7 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
   const [cta, setCta] = useState<(typeof composerOptions.cta)[number]>("Use saved CTA");
   const [scheduledFor, setScheduledFor] = useState("Tomorrow, 7:00 PM");
   const [externalPostId, setExternalPostId] = useState("");
-  const [toast, setToast] = useState("Private MVP ready. Manual Facebook export only.");
+  const [toast, setToast] = useState("Local FYF Studio ready. Manual Facebook export only.");
   const [blockedDetails, setBlockedDetails] = useState<ApiConflictDetails | null>(null);
   const [isBusy, setIsBusy] = useState(false);
   const serverDraftContentRef = useRef<Record<string, string>>(Object.fromEntries(seedDrafts.map((draft) => [draft.id, draft.content])));
@@ -282,7 +282,7 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
         const nextDraft = data.drafts.find((draft) => draft.id === activeDraftId) ?? data.drafts[0];
         if (nextDraft) selectDraft(nextDraft);
       } catch (error) {
-        setToast(error instanceof Error ? error.message : "Could not load private operator data.");
+        setToast(error instanceof Error ? error.message : "Could not load local operator data.");
       }
     }
 
@@ -406,7 +406,7 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
     await runAction(async () => {
       const data = await apiJson<DraftMutationResponse>(`/api/workspaces/${workspace.id}/drafts/${activeDraft.id}/reject`, {
         method: "POST",
-        body: JSON.stringify({ reason: "Rejected during private operator review." })
+        body: JSON.stringify({ reason: "Rejected during local operator review." })
       });
       mergeDraft(data.draft);
       mergeActivity(data.auditEvents);
@@ -470,7 +470,7 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
     setWorkspaceId(nextWorkspaceId);
     const nextDraft = drafts.find((draft) => draft.workspaceId === nextWorkspaceId);
     if (nextDraft) selectDraft(nextDraft);
-    setToast("Workspace switched. Private MVP keeps data scoped.");
+    setToast("Workspace switched. Local Studio keeps data scoped.");
   }
 
   const primaryActionDisabled = isBusy || !activeDraft;
@@ -478,12 +478,12 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
   return (
     <main className="operator-shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
-      <aside className="operator-sidebar" aria-label="Private operator navigation">
+      <aside className="operator-sidebar" aria-label="Local operator navigation">
         <div className="operator-brand">
           <span className="operator-logo">FYF</span>
           <div>
             <strong>FYF AI Studio</strong>
-            <small>Private operator app</small>
+            <small>Local operator app</small>
           </div>
         </div>
 
@@ -554,7 +554,7 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
               </section>
 
               <section className="guardrail-strip">
-                <h2 className="sr-only">Private MVP guardrails</h2>
+                <h2 className="sr-only">Local Studio guardrails</h2>
                 <ul className="check-list inline">
                   <li><Check aria-hidden="true" /> Customize before approval</li>
                   <li><Check aria-hidden="true" /> Risk Guard before export</li>
@@ -730,7 +730,7 @@ export function SocialStudioDashboard({ initialView = "Today" }: { initialView?:
             <div className="operator-grid settings-grid">
               <section className="operator-panel">
                 <div className="panel-heading">
-                  <h2>Private access</h2>
+                  <h2>Local access</h2>
                   <small>1-2 real users first</small>
                 </div>
                 <ul className="check-list">

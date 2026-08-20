@@ -15,7 +15,7 @@ This document preserves the earlier hosted-workflow contract as a deferred desig
 ## 2. Component Boundaries
 
 ### Boundary 1: Next.js Control Panel ➔ Command API
-- **Caller:** Web Browser / Next.js Control Panel (Operator / Victor)
+- **Caller:** Web Browser / Next.js Control Panel (Operator / Human Approver)
 - **Receiver:** Next.js Server Actions / Command API (`POST /api/commands/*`)
 - **Authentication:** Server-side authenticated session cookie / JWT
 - **Input:** JSON command payload (`{ workspaceId, commandType, idempotencyKey, expectedStateVersion, payload }`)
@@ -119,7 +119,7 @@ This document preserves the earlier hosted-workflow contract as a deferred desig
 - **Safe Audit Evidence:** Research audit log with query hash, target domain, fetch timestamp, and validation status
 
 ### Boundary 9: Human Approval UI ➔ Command API
-- **Caller:** Operator Web Browser (Victor / Human Approver)
+- **Caller:** Operator Web Browser (Human Approver)
 - **Receiver:** Next.js Command API (`POST /api/commands/approve`)
 - **Authentication:** Server-side authenticated session cookie
 - **Input:** Approval command payload (`{ workspaceId, workflowRunId, expectedDraftVersionId, expectedDraftVersion, expectedStateVersion, decision: 'approve' | 'revise' | 'cancel', feedback? }`)
@@ -132,7 +132,7 @@ This document preserves the earlier hosted-workflow contract as a deferred desig
 - **Safe Audit Evidence:** Audit log entry with approver user ID, draft version, decision type, and timestamp
 
 ### Boundary 10: Manual Export UI/API ➔ Export Packager
-- **Caller:** Operator Web Browser (Victor)
+- **Caller:** Operator Web Browser (Human Approver)
 - **Receiver:** Next.js Export API (`POST /api/commands/export`)
 - **Authentication:** Server-side authenticated session cookie
 - **Input:** Export request (`{ workspaceId, workflowRunId, expectedDraftVersionId, expectedDraftVersion, expectedStateVersion }`)

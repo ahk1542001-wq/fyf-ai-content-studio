@@ -12,7 +12,7 @@
 ## 1. Historical Hosted Positioning & Decisions (Deferred)
 
 1. **Agent-as-a-Service System:** FYF AI is an autonomous content team. The operator or customer provides a brief, and the system executes strategy, conditional research, drafting, brand voice review, and quality review, returning a completed post for human approval.
-2. **Initial Pilot Scope:** FYF AI Facebook page content focusing on AI automation and AI agents. First operator, customer, and human approver is Victor.
+2. **Initial Pilot Scope:** FYF content focuses on practical AI automation and agent workflows. A human operator remains the customer-facing owner and final approver.
 3. **Vertex AI / Gemini Exclusive Provider (V1):** Selected because the owner has active Google Cloud trial credits and no paid API balances for external providers (OpenAI/Anthropic/Groq).
 4. **Mandatory Human Approval:** No post leaves the system without explicit human review and approval.
 5. **Manual Export Only:** Content is exported via manual copy to Facebook. Automated social media posting is prohibited in V1.

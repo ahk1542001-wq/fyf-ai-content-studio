@@ -14,7 +14,9 @@ type SqliteDatabase = {
 };
 
 function loadSqlite() {
-  const require = createRequire(import.meta.url);
+  // Turbopack cannot externalize a CommonJS require created from import.meta.url
+  // for the built-in node:sqlite module. Use a stable absolute filename instead.
+  const require = createRequire(join(process.cwd(), "package.json"));
   const { DatabaseSync } = require("node:sqlite") as typeof import("node:sqlite");
   return DatabaseSync;
 }

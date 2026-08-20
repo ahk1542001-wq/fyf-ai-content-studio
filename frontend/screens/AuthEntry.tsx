@@ -50,7 +50,7 @@ export function AuthEntry({ children }: { children: React.ReactNode }) {
           });
           return;
         }
-        setAuthState({ type: "success", message: "Private session is ready. Continue the smoke test." });
+        setAuthState({ type: "success", message: "Local session is ready. Continue the smoke test." });
       });
       cleanHash();
     }
@@ -64,7 +64,7 @@ export function AuthEntry({ children }: { children: React.ReactNode }) {
           <div className="auth-entry-icon error">
             <AlertTriangle aria-hidden="true" />
           </div>
-          <p className="auth-entry-kicker">Private FYF access</p>
+          <p className="auth-entry-kicker">FYF local access</p>
           <h1 id="auth-entry-title">{expired ? "Invite link expired" : "Sign-in link failed"}</h1>
           <p>{authState.description}</p>
           <div className="auth-entry-actions">
@@ -74,7 +74,7 @@ export function AuthEntry({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           <small>
-            Ask Codex to resend a fresh Supabase invite, then open the newest email link in this same browser.
+            Request a fresh sign-in link, then open the newest email link in this same browser.
           </small>
         </section>
       </main>

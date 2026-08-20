@@ -2,7 +2,7 @@ import { okJson, routeError } from "@/backend/apiResponse";
 import { getDemoRepository } from "@/backend/demoRepository";
 import { buildApprovedVideoContentContract, type VideoVoiceMode } from "@/backend/videoContract";
 
-const voiceModes = new Set<VideoVoiceMode>(["victor", "ai", "dual"]);
+const voiceModes = new Set<VideoVoiceMode>(["configured", "ai", "dual"]);
 
 export async function GET(
   request: Request,
@@ -22,7 +22,7 @@ export async function GET(
     if (!approval) throw new Error("Approval record not found for video handoff");
 
     const requestedVoice = new URL(request.url).searchParams.get("voice") ?? "ai";
-    if (!voiceModes.has(requestedVoice as VideoVoiceMode)) throw new Error("Voice mode must be victor, ai, or dual");
+    if (!voiceModes.has(requestedVoice as VideoVoiceMode)) throw new Error("Voice mode must be configured, ai, or dual");
 
     const contract = buildApprovedVideoContentContract({
       workspace,

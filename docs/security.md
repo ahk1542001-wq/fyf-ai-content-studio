@@ -7,11 +7,12 @@
 ## Current release boundary
 
 The `/api/workspaces/**` handlers are local/demo-only and fail closed in
-production by default. This repository is private while its history and FYF
-data boundary are reviewed. Public deployment is not approved: enabling
+production by default. This repository is a public, local-first reference
+implementation; its checked-in tree contains no credentials, local database,
+generated output, or private history. Public hosting is not implied: enabling
 `FYF_DEMO_API_ENABLED` does not add authentication and must never be used as a
-public access control. Hosted auth, durable storage, and a sanitized public
-mirror require a separate owner-approved design.
+public access control. Hosted auth and durable storage require a separate
+owner-approved design.
 
 ---
 

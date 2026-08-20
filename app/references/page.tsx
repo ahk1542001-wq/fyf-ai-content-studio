@@ -118,7 +118,7 @@ export default function ReferencesPage() {
         <p className="eyebrow">Separate memory</p>
         <h1>References</h1>
         <p className="page-subtitle">
-          Save only raw examples Victor approves as reusable style guidance. This is not Page Data and not the generated Content library.
+          Save only raw examples a human operator approves as reusable style guidance. This is not Page Data and not the generated Content library.
         </p>
       </div>
 
@@ -183,7 +183,7 @@ export default function ReferencesPage() {
         </div>
 
         <div className="messaging">
-          <strong>Manual gate:</strong> generated posts do not become references automatically. Victor chooses what teaches the AI.
+          <strong>Manual gate:</strong> generated posts do not become references automatically. A human operator chooses what teaches the AI.
           {hiddenVicCount > 0 ? ` ${hiddenVicCount} Vic AI item(s) are hidden from this FYF library.` : ""}
         </div>
 

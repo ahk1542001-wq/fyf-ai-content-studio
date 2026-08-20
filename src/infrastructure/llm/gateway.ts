@@ -3,8 +3,8 @@ import { createVertex } from '@ai-sdk/google-vertex';
 import { z } from 'zod';
 
 export const FYF_VERTEX_MODELS = {
-  creator: process.env.FYF_CREATOR_MODEL_ID?.trim() || 'gemini-3.5-flash',
-  editor: process.env.FYF_EDITOR_MODEL_ID?.trim() || 'gemini-3.5-flash-lite',
+  creator: process.env.FYF_CREATOR_MODEL_ID?.trim() || 'gemini-3.7-flash',
+  editor: process.env.FYF_EDITOR_MODEL_ID?.trim() || 'gemini-3.7-flash',
   location: process.env.GOOGLE_VERTEX_LOCATION?.trim() || 'us',
 } as const;
 
@@ -37,7 +37,6 @@ export class LLMGateway {
     const { text } = await generateText({
       model: vertex(FYF_VERTEX_MODELS.creator),
       prompt,
-      temperature: 0.7,
     });
 
     return text;
@@ -45,7 +44,7 @@ export class LLMGateway {
 
   /**
    * Creator Agent (Maker)
-   * Uses the GA Gemini 3.5 Flash migration target for Gemini 2.5 Pro.
+   * Uses Gemini 3.7 Flash for Burmese draft creation.
    */
   static async createDraft(topic: string, businessGoal: string, brandExamples: string[]): Promise<string> {
     const formattedExamples = brandExamples.length > 0
@@ -84,7 +83,7 @@ Output ONLY the final Burmese Facebook post text. Do not include introductory or
 
   /**
    * Editor Agent (Checker)
-   * Uses the GA Gemini 3.5 Flash-Lite migration target for Gemini 2.5 Flash.
+   * Uses Gemini 3.7 Flash structured output for draft review.
    */
   static async reviewDraft(draft: string): Promise<ReviewDraftResult> {
     const prompt = `You are the Editor / Checker Agent for FYF AI. Review the following Facebook post draft written for Burmese SME business owners.
