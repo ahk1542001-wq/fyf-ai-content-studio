@@ -1,6 +1,6 @@
 # Public Release Audit
 
-Status: **Local deployment checks green — public push/deploy is not approved**
+Status: **Public candidate branch pushed — hosted deployment is not approved**
 
 This repository remains the working source for the FYF AI Content Studio. A public release must be produced as a reviewed, allowlisted snapshot; it must not be made by deleting files from this private history.
 
@@ -60,6 +60,7 @@ The application is locally deployment-ready: dependency, test, lint, typecheck, 
 - [x] Run automated secret-pattern, filename, and history scans without printing secret values.
 - [x] Verify the source tree with `npm test -- --run`, `npm run lint`, `npx tsc --noEmit --incremental false`, `npm run build`, `npm audit --omit=dev --audit-level=high`, and `git diff --check`.
 - [x] Document the public distribution boundary above.
-- [ ] Obtain explicit owner approval for the exact repository and branch before any push, visibility change, or deployment.
+- [x] Publish the verified clean snapshot to the owner-selected repository branch without rewriting private history.
+- [ ] Approve and run a separate hosted deployment target; this report does not authorize hosting or production rollout.
 
-Until every gate is checked, the correct status is **release review — blocked by history/public-boundary work**, even though the local deployment checks and security dependency gate are green.
+Until every gate is checked, the correct status is **release review — candidate branch available; manual release review and hosted deployment remain pending**, even though the local deployment checks and security dependency gate are green.
