@@ -3,12 +3,12 @@
 Local-first workspace for turning FYF brand ideas into reviewed Burmese content and approved video handoffs.
 
 > [!NOTE]
-> **Current Status:** Local-first FYF Studio — brand context, human review gates, and manual export only. Public repository release is deferred until the history/data gate passes.
+> **Current Status:** Public FYF Studio snapshot — local-first runtime, brand context, human review gates, and manual export only. Hosted deployment is a separate pending step.
 > Phase 0B (DB/Auth Connection Spike) is **not authorized** and has not been started.
 
 > [!WARNING]
-> **DISCLAIMER: MIGRATING CODEBASE**
-> Some internal modules still carry legacy names while the runtime is being aligned with the FYF Studio. The migration keeps the local-first workflow and approval boundaries and does not delete preserved state.
+> **Release boundary**
+> This public snapshot excludes credentials, local databases, generated output, and private development history. Hosted auth/storage and automatic publishing are not enabled.
 
 ## Repository boundary
 
