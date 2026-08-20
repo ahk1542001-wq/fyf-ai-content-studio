@@ -1,8 +1,8 @@
 # Public Release Audit
 
-Status: **Release candidate branch pushed in the private repository — hosted deployment is not approved**
+Status: **Public snapshot published — hosted deployment is not approved**
 
-This repository remains the working source for the FYF AI Content Studio. A public release must be produced as a reviewed, allowlisted snapshot; it must not be made by deleting files from this private history.
+This repository is the public FYF AI Content Studio snapshot. It was produced from a reviewed, allowlisted candidate; the private development repository and its history remain separate.
 
 ## Security baseline
 
@@ -51,11 +51,11 @@ The application is locally deployment-ready: dependency, test, lint, typecheck, 
 
 - Visibility target: public repository, once the release snapshot is approved.
 - This release does not add an open-source license or grant reuse rights; a later distribution change must be an explicit owner decision.
-- The private working history remains separate from the public snapshot.
+- The private working history remains separate from this public snapshot.
 
 ## Integration boundary
 
-GitHub reports no common ancestor between `main` and `codex/fyf-public-release-20260820`. A PR/merge into the current `main` would reconnect the private history that this snapshot intentionally excludes, so it is not a safe merge target. The safe choices are a new repository created from this orphan snapshot, or an explicit owner-approved history/visibility migration.
+The original private repository and this public snapshot intentionally have no shared history. This repository's `main` is the clean release baseline; future updates should be exported through the same allowlist process rather than merged from private history.
 
 ## Required gates before publication
 
@@ -64,8 +64,8 @@ GitHub reports no common ancestor between `main` and `codex/fyf-public-release-2
 - [x] Run automated secret-pattern, filename, and history scans without printing secret values.
 - [x] Verify the source tree with `npm test -- --run`, `npm run lint`, `npx tsc --noEmit --incremental false`, `npm run build`, `npm audit --omit=dev --audit-level=high`, and `git diff --check`.
 - [x] Document the public distribution boundary above.
-- [x] Publish the verified clean snapshot to the candidate branch without rewriting private history.
-- [ ] Choose the safe integration target: a new repository from the orphan snapshot, or an explicitly approved history/visibility migration.
+- [x] Publish the verified clean snapshot to this public repository's `main` without rewriting private history.
+- [x] Use a separate public repository so private history stays isolated.
 - [ ] Approve and run a separate hosted deployment target; this report does not authorize hosting or production rollout.
 
-Until every gate is checked, the correct status is **release review — candidate branch available; manual release review and hosted deployment remain pending**, even though the local deployment checks and security dependency gate are green.
+Until every gate is checked, the correct status is **release review — public snapshot available; manual release review and hosted deployment remain pending**, even though the local deployment checks and security dependency gate are green.
