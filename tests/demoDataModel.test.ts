@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { GET as getDrafts, POST as generateDraftRoute } from "@/app/api/workspaces/[workspaceId]/drafts/route";
 import { POST as resetWorkspaceRoute } from "@/app/api/workspaces/[workspaceId]/reset/route";
 import { POST as testIntegrationRoute } from "@/app/api/workspaces/[workspaceId]/integrations/test/route";
-import { createDemoState, DemoRepository, resetDemoRepository } from "@/backend/demoRepository";
+import { createDemoState, DemoRepository, normalizeDemoState, resetDemoRepository } from "@/backend/demoRepository";
 import { generateDraft } from "@/backend/draftLifecycle";
 import type { DemoAppState, DemoSession, IntegrationLog, MediaAsset, PromptVersion, StyleExample } from "@/backend/types";
 
@@ -35,6 +35,105 @@ type IntegrationTestResponse = {
 };
 
 describe("demo runtime data model", () => {
+  it("normalizes a configured legacy workspace across every scoped collection", () => {
+    const legacyWorkspaceId = "legacy-workspace";
+    const state = createDemoState();
+    state.workspaces = state.workspaces.filter((workspace) => workspace.id !== "ws-fyf");
+    state.workspaces.push({
+      id: legacyWorkspaceId,
+      name: "Legacy FYF workspace",
+      pageName: "FYF",
+      demoMode: true,
+      riskSensitivity: "strict",
+      industry: "Enterprise AI Systems",
+      targetAudience: "Creators",
+      brandSummary: "Legacy local state"
+    });
+
+    const scopedCollections: Array<Array<{ workspaceId: string }>> = [
+      state.workspaceMembers,
+      state.styleExamples,
+      state.drafts,
+      state.draftVersions,
+      state.mediaAssets,
+      state.promptVersions,
+      state.publishJobs,
+      state.scheduleJobs,
+      state.auditEvents,
+      state.integrationSettings,
+      state.integrationLogs,
+      state.analyticsSnapshots,
+      state.contentIdeas,
+      state.onboardingChecklistItems,
+      state.brandProfiles
+    ];
+    for (const collection of scopedCollections) {
+      for (const item of collection) {
+        if (item.workspaceId === "ws-fyf") item.workspaceId = legacyWorkspaceId;
+      }
+    }
+
+    const previousAlias = process.env.FYF_LEGACY_WORKSPACE_ID;
+    process.env.FYF_LEGACY_WORKSPACE_ID = legacyWorkspaceId;
+    try {
+      const normalized = normalizeDemoState(state);
+      expect(normalized.workspaces.some((workspace) => workspace.id === "ws-fyf")).toBe(true);
+      expect(normalized.workspaces.some((workspace) => workspace.id === legacyWorkspaceId)).toBe(false);
+      const normalizedCollections: Array<Array<{ workspaceId: string }>> = [
+        normalized.workspaceMembers,
+        normalized.styleExamples,
+        normalized.drafts,
+        normalized.draftVersions,
+        normalized.mediaAssets,
+        normalized.promptVersions,
+        normalized.publishJobs,
+        normalized.scheduleJobs,
+        normalized.auditEvents,
+        normalized.integrationSettings,
+        normalized.integrationLogs,
+        normalized.analyticsSnapshots,
+        normalized.contentIdeas,
+        normalized.onboardingChecklistItems,
+        normalized.brandProfiles
+      ];
+      for (const collection of normalizedCollections) {
+        expect(collection.every((item) => item.workspaceId !== legacyWorkspaceId)).toBe(true);
+      }
+      expect(normalized.workspaces.some((workspace) => workspace.id === "ws-agency")).toBe(true);
+    } finally {
+      if (previousAlias === undefined) delete process.env.FYF_LEGACY_WORKSPACE_ID;
+      else process.env.FYF_LEGACY_WORKSPACE_ID = previousAlias;
+    }
+  });
+
+  it("preserves a legacy workspace when the canonical workspace already exists", () => {
+    const legacyWorkspaceId = "legacy-workspace";
+    const state = createDemoState();
+    state.workspaces.push({
+      id: legacyWorkspaceId,
+      name: "Legacy workspace",
+      pageName: "Legacy",
+      demoMode: true,
+      riskSensitivity: "standard",
+      industry: "Other",
+      targetAudience: "Operators",
+      brandSummary: "Review-only legacy state"
+    });
+    state.drafts.push({ ...state.drafts[0], id: "legacy-draft", workspaceId: legacyWorkspaceId });
+
+    const previousAlias = process.env.FYF_LEGACY_WORKSPACE_ID;
+    process.env.FYF_LEGACY_WORKSPACE_ID = legacyWorkspaceId;
+    try {
+      const normalized = normalizeDemoState(state);
+      expect(normalized.workspaces.some((workspace) => workspace.id === "ws-fyf")).toBe(true);
+      expect(normalized.workspaces.some((workspace) => workspace.id === legacyWorkspaceId)).toBe(true);
+      expect(normalized.drafts.find((draft) => draft.id === "legacy-draft")?.workspaceId).toBe(legacyWorkspaceId);
+    } finally {
+      if (previousAlias === undefined) delete process.env.FYF_LEGACY_WORKSPACE_ID;
+      else process.env.FYF_LEGACY_WORKSPACE_ID = previousAlias;
+    }
+  });
+
   it("carries every V1 core entity in DemoAppState", () => {
     const state = createDemoState();
 

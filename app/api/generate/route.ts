@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { fyfAgentGraph } from '@/src/agents/graph';
-import { createClient } from '@/src/infrastructure/db/server/supabase';
+import { createClient, isSupabaseConfigured } from '@/src/infrastructure/db/server/supabase';
 import { hashContent, isAuthFailure, requireWorkspaceAccess } from '@/src/infrastructure/db/server/auth';
 
 export async function POST(request: Request) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json(
+        { error: 'Supabase generation is not configured' },
+        { status: 503 }
+      );
+    }
+
     const supabase = await createClient();
     const auth = await requireWorkspaceAccess(supabase, ['owner', 'editor']);
 
@@ -142,8 +149,8 @@ export async function POST(request: Request) {
       }
     });
 
-  } catch (error) {
-    console.error('Error generating content:', error);
+  } catch {
+    console.error('Error generating content');
     return NextResponse.json(
       { error: 'Failed to generate content' },
       { status: 500 }

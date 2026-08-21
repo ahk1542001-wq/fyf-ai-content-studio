@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
+  isSupabaseConfigured: vi.fn(),
   graphInvoke: vi.fn()
 }));
 
 vi.mock("@/src/infrastructure/db/server/supabase", () => ({
-  createClient: mocks.createClient
+  createClient: mocks.createClient,
+  isSupabaseConfigured: mocks.isSupabaseConfigured
 }));
 
 vi.mock("@/src/agents/graph", () => ({
@@ -206,6 +208,7 @@ function params<T extends Record<string, string>>(value: T) {
 describe("FYF Phase 1 authenticated routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.isSupabaseConfigured.mockReturnValue(true);
     mocks.graphInvoke.mockResolvedValue({
       brief: {
         topic: "Gold risk plan",
@@ -218,6 +221,22 @@ describe("FYF Phase 1 authenticated routes", () => {
       revisionCount: 0,
       status: "ready_for_human"
     });
+  });
+
+  it("returns 503 when Supabase generation is not configured", async () => {
+    mocks.isSupabaseConfigured.mockReturnValue(false);
+    const { POST } = await import("@/app/api/generate/route");
+
+    const response = await POST(
+      request("/api/generate", {
+        method: "POST",
+        body: JSON.stringify({ topic: "x", goal: "y", format: "facebook_post", tone: "calm" })
+      })
+    );
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "Supabase generation is not configured" });
+    expect(mocks.createClient).not.toHaveBeenCalled();
   });
 
   it("returns 401 when generate is called without Supabase auth", async () => {

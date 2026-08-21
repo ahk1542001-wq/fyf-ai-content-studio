@@ -65,9 +65,50 @@ export function createDemoState(): DemoAppState {
   };
 }
 
-function normalizeDemoState(state: DemoAppState): DemoAppState {
-  const seed = createDemoState();
+type WorkspaceScopedRecord = { workspaceId: string };
+
+function migrateConfiguredLegacyWorkspace(state: DemoAppState): DemoAppState {
+  const legacyWorkspaceId = process.env.FYF_LEGACY_WORKSPACE_ID?.trim();
+  if (
+    !legacyWorkspaceId ||
+    legacyWorkspaceId === "ws-fyf" ||
+    state.workspaces.some((workspace) => workspace.id === "ws-fyf") ||
+    !state.workspaces.some((workspace) => workspace.id === legacyWorkspaceId)
+  ) {
+    return state;
+  }
+
+  const remapWorkspaceRecords = <T extends WorkspaceScopedRecord>(records: T[]) =>
+    records.map((record) =>
+      record.workspaceId === legacyWorkspaceId ? { ...record, workspaceId: "ws-fyf" } : record
+    );
+
   return {
+    ...state,
+    workspaces: state.workspaces.map((workspace) =>
+      workspace.id === legacyWorkspaceId ? { ...workspace, id: "ws-fyf" } : workspace
+    ),
+    workspaceMembers: remapWorkspaceRecords(state.workspaceMembers),
+    styleExamples: remapWorkspaceRecords(state.styleExamples),
+    drafts: remapWorkspaceRecords(state.drafts),
+    draftVersions: remapWorkspaceRecords(state.draftVersions),
+    mediaAssets: remapWorkspaceRecords(state.mediaAssets),
+    promptVersions: remapWorkspaceRecords(state.promptVersions),
+    publishJobs: remapWorkspaceRecords(state.publishJobs),
+    scheduleJobs: remapWorkspaceRecords(state.scheduleJobs),
+    auditEvents: remapWorkspaceRecords(state.auditEvents),
+    integrationSettings: remapWorkspaceRecords(state.integrationSettings),
+    integrationLogs: remapWorkspaceRecords(state.integrationLogs),
+    analyticsSnapshots: remapWorkspaceRecords(state.analyticsSnapshots),
+    contentIdeas: remapWorkspaceRecords(state.contentIdeas),
+    onboardingChecklistItems: remapWorkspaceRecords(state.onboardingChecklistItems),
+    brandProfiles: remapWorkspaceRecords(state.brandProfiles)
+  };
+}
+
+export function normalizeDemoState(state: DemoAppState): DemoAppState {
+  const seed = createDemoState();
+  return migrateConfiguredLegacyWorkspace({
     ...seed,
     ...state,
     users: Array.isArray(state.users) ? state.users : seed.users,
@@ -89,7 +130,7 @@ function normalizeDemoState(state: DemoAppState): DemoAppState {
       ? state.onboardingChecklistItems
       : seed.onboardingChecklistItems,
     brandProfiles: Array.isArray(state.brandProfiles) ? state.brandProfiles : seed.brandProfiles
-  };
+  });
 }
 
 export class DemoRepository {

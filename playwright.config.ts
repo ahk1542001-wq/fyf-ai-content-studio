@@ -7,7 +7,7 @@ export default defineConfig({
   workers: 1,
   reporter: [["list"]],
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3100",
     trace: "retain-on-failure",
     screenshot: "only-on-failure"
   },
@@ -22,9 +22,9 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: "npm run dev",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: true,
+    command: "FYF_DEMO_API_ENABLED=true FYF_DEMO_PERSISTENCE=memory npm run dev -- --port 3100",
+    url: "http://127.0.0.1:3100",
+    reuseExistingServer: false,
     timeout: 120_000
   }
 });

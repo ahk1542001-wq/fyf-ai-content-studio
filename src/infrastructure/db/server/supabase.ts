@@ -1,6 +1,13 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+export function isSupabaseConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+  )
+}
+
 /**
  * Creates a Supabase client for use in Next.js Server Components, Server Actions, and Route Handlers.
  * It automatically handles passing cookies to Supabase for authentication.
